@@ -20,6 +20,7 @@ final class AVCEncoder: NSObject {
         "dataRateLimits",
         "enabledHardwareEncoder", // macOS only
         "maxKeyFrameIntervalDuration",
+        "pixelFormatTypeKey",
     ]
 
     static let defaultWidth:Int32 = 480
@@ -146,6 +147,14 @@ final class AVCEncoder: NSObject {
             }
         }
     }
+    var pixelFormatTypeKey:OSType = kCVPixelFormatType_32BGRA {
+        didSet {
+            guard pixelFormatTypeKey != oldValue else {
+                return
+            }
+            invalidateSession = true
+        }
+    }
     var formatDescription:CMFormatDescriptionRef? = nil {
         didSet {
             guard !CMFormatDescriptionEqual(formatDescription, oldValue) else {
@@ -161,6 +170,7 @@ final class AVCEncoder: NSObject {
         var attributes:[NSString: AnyObject] = AVCEncoder.defaultAttributes
         attributes[kCVPixelBufferWidthKey] = NSNumber(int: width)
         attributes[kCVPixelBufferHeightKey] = NSNumber(int: height)
+        attributes[kCVPixelBufferPixelFormatTypeKey] = NSNumber(int: Int32(pixelFormatTypeKey))
         return attributes
     }
     private var invalidateSession:Bool = true
